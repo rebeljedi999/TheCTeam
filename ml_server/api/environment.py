@@ -39,9 +39,22 @@ class UnrealFPS(py_environment.PyEnvironment):
         if self._episode_ended:
             return self.reset()
 
-        if self._state[3] > 0 and self._state[2] > 0:
-            self.action = act
+        # if agent completes all objectives before time runs out, end episode and give reward
+        if self._state[4] == 1:
+            self._episode_ended = True
+            return ts.termination(np.array([self._state], dtype=object), 10)
 
+        # if time runs out, end episode and negative reward
+        if self._state[3] <= 0:
+            self._episode_ended = True
+            return ts.termination(np.array([self._state], dtype=object), -10)
 
+        # if agent is still alive, give reward
+        if self._state[2] > 0:
+            return ts.transistion(np.array([self._state], dtype=object), reward=reward, discount=1.0)
 
+        # otherwise agent is dead, terminate with negative reward
+        else:
+            self._episode_ended = True
+            return ts.termination(np.array([self._state], dtype=object), -10)
 
