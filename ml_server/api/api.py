@@ -8,10 +8,10 @@ from flask import request, jsonify
 
 import numpy as np
 import tensorflow as tf
+from tf_agents.agents import tf_agent
 
 from tf_agents.agents.reinforce import reinforce_agent
 from tf_agents.drivers import dynamic_step_driver
-from tf_agents.environments import suite_gym
 from tf_agents.environments import tf_py_environment
 from tf_agents.eval import metric_utils
 from tf_agents.metrics import tf_metrics
@@ -19,141 +19,173 @@ from tf_agents.networks import actor_distribution_network
 from tf_agents.replay_buffers import tf_uniform_replay_buffer
 from tf_agents.trajectories import trajectory
 from tf_agents.utils import common
+# from .environment import AgentEnv
+from tf_agents.environments import py_environment
+from tf_agents.environments import tf_environment
+from tf_agents.environments import utils
+from tf_agents.specs import array_spec
+from tf_agents.environments import wrappers
+from tf_agents.trajectories import time_step as ts
+from tf_agents.networks import network
+from tf_agents.specs import array_spec
+from tf_agents.specs import tensor_spec
+from tf_agents.policies import actor_policy
 
 tf.compat.v1.enable_v2_behavior()
 
-env_name = "CartPole-v0" # @param {type:"string"}
-num_iterations = 250 # @param {type:"integer"}
-collect_episodes_per_iteration = 2 # @param {type:"integer"}
-replay_buffer_capacity = 2000 # @param {type:"integer"}
-
-fc_layer_params = (100,)
-
-learning_rate = 1e-3 # @param {type:"number"}
-log_interval = 25 # @param {type:"integer"}
-num_eval_episodes = 10 # @param {type:"integer"}
-eval_interval = 50 # @param {type:"integer"}
-
-env = suite_gym.load(env_name)
-train_py_env = suite_gym.load(env_name)
-eval_py_env = suite_gym.load(env_name)
-
-train_env = tf_py_environment.TFPyEnvironment(train_py_env)
-eval_env = tf_py_environment.TFPyEnvironment(eval_py_env)
+"""
+Policy
+"""
 
 
-actor_net = actor_distribution_network.ActorDistributionNetwork(
-    train_env.observation_spec(),
-    train_env.action_spec(),
-    fc_layer_params=fc_layer_params)
+class ActionNet(network.Network):
 
-optimizer = tf.compat.v1.train.AdamOptimizer(learning_rate=learning_rate)
+    def __init__(self, input_tensor_spec, output_tensor_spec):
+        super(ActionNet, self).__init__(
+            input_tensor_spec=input_tensor_spec,
+            state_spec=(),
+            name='ActionNet')
+        self._output_tensor_spec = output_tensor_spec
+        self._sub_layers = [
+            tf.keras.layers.Dense(
+                8, activation=tf.nn.softmax),
+        ]
 
-train_step_counter = tf.compat.v2.Variable(0)
+    def call(self, observations, step_type, network_state):
+        del step_type
 
-tf_agent = reinforce_agent.ReinforceAgent(
-    train_env.time_step_spec(),
-    train_env.action_spec(),
-    actor_network=actor_net,
-    optimizer=optimizer,
-    normalize_returns=True,
-    train_step_counter=train_step_counter)
+        output = tf.cast(observations, dtype=tf.float32)
+        for layer in self._sub_layers:
+            output = layer(output)
+        output = np.argmax(output)
+        print(output)
+        actions = tf.reshape(
+            output, [-1] + self._output_tensor_spec.shape.as_list())
 
-tf_agent.initialize()
-
-eval_policy = tf_agent.policy
-collect_policy = tf_agent.collect_policy
-
-def compute_avg_return(environment, policy, num_episodes=10):
-
-  total_return = 0.0
-  for _ in range(num_episodes):
-
-    time_step = environment.reset()
-    episode_return = 0.0
-
-    while not time_step.is_last():
-      action_step = policy.action(time_step)
-      time_step = environment.step(action_step.action)
-      episode_return += time_step.reward
-    total_return += episode_return
-
-  avg_return = total_return / num_episodes
-  return avg_return.numpy()[0]
-
-replay_buffer = tf_uniform_replay_buffer.TFUniformReplayBuffer(
-    data_spec=tf_agent.collect_data_spec,
-    batch_size=train_env.batch_size,
-    max_length=replay_buffer_capacity)
+        # Scale and shift actions to the correct range if necessary.
+        return actions, network_state
 
 
-def collect_episode(environment, policy, num_episodes):
+input_tensor_spec = tensor_spec.TensorSpec((1, 4), tf.float32)
+#print('Input tensor spec: ')
+#print(input_tensor_spec)
 
-  episode_counter = 0
-  environment.reset()
+time_step_spec = ts.time_step_spec(input_tensor_spec)
+#print('Time step spec: ')
+#print(time_step_spec)
 
-  while episode_counter < num_episodes:
-    time_step = environment.current_time_step()
-    action_step = policy.action(time_step)
-    next_time_step = environment.step(action_step.action)
-    traj = trajectory.from_transition(time_step, action_step, next_time_step)
+action_spec = tensor_spec.BoundedTensorSpec(
+    (), np.int64, minimum=0, maximum=8)
+#print('-')
 
-    # Add trajectory to the replay buffer
-    replay_buffer.add_batch(traj)
+action_net = ActionNet(input_tensor_spec, action_spec)
 
-    if traj.is_boundary():
-      episode_counter += 1
 
-tf_agent.train = common.function(tf_agent.train)
+my_actor_policy = actor_policy.ActorPolicy(
+    time_step_spec=time_step_spec,
+    action_spec=action_spec,
+    actor_network=action_net)
 
-variable = {}
+"""
+Troubleshooting statements
+Checking shapes, etc
+"""
+#observation = tf.ones([1] + time_step_spec.observation.shape.as_list())
+#print(time_step_spec.observation.shape.as_list())
+#observation = [0, 5, 6, 3]
+#observation = tf.constant([0, 5, 6, 3], shape=(1, 4), dtype=tf.float32)
+#print('Observation: ')
+#print(observation)
+#time_step = ts.restart(observation)
+#print('Time step: ')
+#print(time_step)
+
+#action_step = my_actor_policy.action(time_step)
+#print('Action: ')
+#print(action_step)
+"""
+Etc
+"""
+class Agent(tf_agent.TFAgent):
+  def __init__(self):
+    self._situation = tf.compat.v2.Variable(0, dtype=tf.int32)
+    policy = my_actor_policy
+    time_step_spec = policy.time_step_spec
+    action_spec = policy.action_spec
+    super(Agent, self).__init__(time_step_spec=time_step_spec, action_spec=action_spec, policy=policy, collect_policy=policy, train_sequence_length=None)
+
+  def _initialize(self):
+    return tf.compat.v1.variables_initializer(self.variables)
+
+  def _train(self, experience, weights=None):
+    observation = experience.observation
+    action = experience.action
+    reward = experience.reward
+    return tf_agent.LossInfo((), ())
+
+agent = Agent()
+
+
+"""
+Turns an initial observation, the resulting action, and the observation after that action
+into a trajectory, which can be used to train the model.
+"""
+
+def trajectory_for_training(initial_step, action_step, final_step):
+    return trajectory.Trajectory(observation=tf.expand_dims(initial_step.observation, 0),
+                                 action=tf.expand_dims(action_step.action, 0),
+                                 policy_info=action_step.info,
+                                 reward=tf.expand_dims(final_step.reward, 0),
+                                 discount=tf.expand_dims(
+                                     final_step.discount, 0),
+                                 step_type=tf.expand_dims(
+                                     initial_step.step_type, 0),
+                                 next_step_type=tf.expand_dims(final_step.step_type, 0))
+
+
+local_data = {}
 
 ###############################################################
 app = flask.Flask(__name__)
 app.config["DEBUG"] = True
 
-print('Observation Spec:')
-print(env.time_step_spec().observation)
-print('Action Spec:')
-print(env.action_spec())
 
-@app.route('/start', methods=['GET'])
-def start():
-    avg_return = compute_avg_return(eval_env, tf_agent.policy, num_eval_episodes)
-    returns = [avg_return]
+@app.route('/start', methods=['POST'])
+def observe():
+    observation = request.get_json(force=True)
+    obs = tf.constant(observation["visual_sensor"], shape=(1,4), dtype=tf.float32)
+    time_step = ts.restart(obs)
+    action_step = my_actor_policy.action(time_step)
+    action = action_step.action.numpy()[0]
+    local_data["action"] = action_step
+    local_data["step"] = time_step
+    return jsonify({"Action": str(action)})
 
-    for _ in range(num_iterations):
 
-  # Collect a few episodes using collect_policy and save to the replay buffer.
-        collect_episode(train_env, tf_agent.collect_policy, collect_episodes_per_iteration)
 
-    # Use data from the buffer and update the agent's network.
-        experience = replay_buffer.gather_all()
-        train_loss = tf_agent.train(experience)
-        replay_buffer.clear()
+@app.route('/train', methods=['POST'])
+def train():
+    training = request.get_json(force=True)
+    reward = training["reward"]
+    obs = tf.constant(training["visual_sensor"], shape =(1,4), dtype=tf.float32)
+    time_step = ts.transition(obs, reward)
+    last_step = local_data["step"]
+    action = local_data["action"]
+    experience = trajectory_for_training(last_step, action, time_step)
+    agent._train(experience)
+    local_data["step"] = time_step
+    time_step = ts.transition(obs, reward[0])
+    action_step = my_actor_policy.action(time_step)
+    action = action_step.action.numpy()[0]
+    local_data["action"] = action_step
+    return jsonify({'Action': str(action)})
 
-        step = tf_agent.train_step_counter.numpy()
 
-        if step % log_interval == 0:
-            print('step = {0}: loss = {1}'.format(step, train_loss.loss))
-
-        if step % eval_interval == 0:
-            avg_return = compute_avg_return(eval_env, tf_agent.policy, num_eval_episodes)
-            print('step = {0}: Average Return = {1}'.format(step, avg_return))
-            returns.append(avg_return)
-    print(returns)
-    variable['agent'] = tf_agent
-    return jsonify({'Results': 'Success'})
-
-@app.route('/reset', methods=['GET'])
-def reset():
-    tf_agent.train_step_counter.assign(0)
-    return jsonify({'Operation': 'Successful'})
- 
-    
 @app.route('/testing', methods=['GET'])
 def test():
     if variable['agent']:
         return 'True'
     return variable
+
+
 app.run()
