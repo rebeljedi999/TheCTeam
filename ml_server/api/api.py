@@ -32,7 +32,8 @@ from tf_agents.specs import tensor_spec
 from tf_agents.policies import actor_policy
 
 tf.compat.v1.enable_v2_behavior()
-
+physical_devices = tf.config.list_physical_devices('GPU')
+tf.config.experimental.set_memory_growth(physical_devices[0], True)
 """
 Policy
 """
@@ -66,7 +67,7 @@ class ActionNet(network.Network):
         return actions, network_state
 
 
-input_tensor_spec = tensor_spec.TensorSpec((1, 4), tf.float32)
+input_tensor_spec = tensor_spec.TensorSpec((1, 91), tf.float32)
 #print('Input tensor spec: ')
 #print(input_tensor_spec)
 
@@ -152,13 +153,14 @@ app.config["DEBUG"] = True
 @app.route('/start', methods=['POST'])
 def observe():
     observation = request.get_json(force=True)
-    obs = tf.constant(observation["visual_sensor"], shape=(1,4), dtype=tf.float32)
+    print(observation)
+    obs = tf.constant(observation["visualSensor"], shape=(1,91), dtype=tf.float32)
     time_step = ts.restart(obs)
     action_step = my_actor_policy.action(time_step)
     action = action_step.action.numpy()[0]
     local_data["action"] = action_step
     local_data["step"] = time_step
-    return jsonify({"Action": str(action)})
+    return jsonify({'action': float(action)})
 
 
 
@@ -166,25 +168,23 @@ def observe():
 def train():
     training = request.get_json(force=True)
     reward = training["reward"]
-    obs = tf.constant(training["visual_sensor"], shape =(1,4), dtype=tf.float32)
+    obs = tf.constant(training["visualSensor"], shape =(1,91), dtype=tf.float32)
     time_step = ts.transition(obs, reward)
     last_step = local_data["step"]
     action = local_data["action"]
     experience = trajectory_for_training(last_step, action, time_step)
     agent._train(experience)
     local_data["step"] = time_step
-    time_step = ts.transition(obs, reward[0])
+    time_step = ts.transition(obs, reward)
     action_step = my_actor_policy.action(time_step)
     action = action_step.action.numpy()[0]
     local_data["action"] = action_step
-    return jsonify({'Action': str(action)})
+    return jsonify({'action': float(action)})
 
 
-@app.route('/testing', methods=['GET'])
+@app.route('/testing', methods=['POST'])
 def test():
-    if variable['agent']:
-        return 'True'
-    return variable
+    print(request.get_json(Force=True))
 
 
 app.run()
