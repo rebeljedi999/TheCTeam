@@ -2302,3 +2302,16 @@ LogConfig: Setting CVar [[r.setres:1280x720]]
 [2021.04.04-01.38.11:201][ 72]LogAudioMixer: FMixerPlatformXAudio2::StopAudioStream() called
 [2021.04.04-01.38.11:243][ 72]LogUObjectHash: Compacting FUObjectHashTables data took   1.13ms
 [2021.04.04-01.38.11:287][ 73]LogPlayLevel: Display: Destroying online subsystem :Context_13
+[2021.04.04-01.41.16:429][150]Cmd: POLY SELECT ADJACENT WALLS
+[2021.04.04-01.41.30:345][939]Cmd: POLY SELECT ADJACENT WALLS
+[2021.04.04-01.41.38:659][390]Cmd: POLY SELECT ADJACENT WALLS
+[2021.04.04-01.41.51:941][134]Cmd: POLY SELECT ADJACENT WALLS
+[2021.04.04-01.42.02:873][730]Cmd: POLY SELECT ADJACENT WALLS
+[2021.04.04-01.43.03:414][673]Cmd: OBJ SAVEPACKAGE PACKAGE="/Game/Maps/FLevel" FILE="../../../../../../Users/johna/Documents/GitHub/TheCTeam/TeamC/Content/Maps/FLevel.umap" SILENT=true AUTOSAVING=false KEEPDIRTY=false
+[2021.04.04-01.43.03:420][673]LogUObjectHash: Compacting FUObjectHashTables data took   0.72ms
+[2021.04.04-01.43.03:534][673]LogSavePackage: Moving '../../../../../../Users/johna/Documents/GitHub/TheCTeam/TeamC/Saved/FLevelDA7AAD724842AE876FDFAE99809918CB.tmp' to '../../../../../../Users/johna/Documents/GitHub/TheCTeam/TeamC/Content/Maps/FLevel.umap'
+[2021.04.04-01.43.03:541][673]Cmd: OBJ SAVEPACKAGE PACKAGE="/Game/Maps/FLevel_BuiltData" FILE="../../../../../../Users/johna/Documents/GitHub/TheCTeam/TeamC/Content/Maps/FLevel_BuiltData.uasset" SILENT=true
+[2021.04.04-01.43.03:551][673]LogSavePackage: Moving '../../../../../../Users/johna/Documents/GitHub/TheCTeam/TeamC/Saved/FLevel_BuiltData0744CD464E2299A2229F6D95223F9349.tmp' to '../../../../../../Users/johna/Documents/GitHub/TheCTeam/TeamC/Content/Maps/FLevel_BuiltData.uasset'
+[2021.04.04-01.43.03:565][673]AssetCheck: New page: Asset Save: multiple assets
+[2021.04.04-01.43.03:565][673]LogContentValidation: Display: Validating World /Game/Maps/FLevel.FLevel
+[2021.04.04-01.43.03:565][673]LogContentValidation: Display: Validating MapBuildDataRegistry /Game/Maps/FLevel_BuiltData.FLevel_BuiltData
