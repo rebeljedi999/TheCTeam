@@ -28,8 +28,11 @@ from tf_agents.specs import tensor_spec
 from tf_agents.policies import actor_policy
 
 tf.compat.v1.enable_v2_behavior()
-#physical_devices = tf.config.list_physical_devices('GPU')
-#tf.config.experimental.set_memory_growth(physical_devices[0], True)
+
+# activate GPU if one is available
+physical_devices = tf.config.list_physical_devices('GPU')
+if len(physical_devices) > 0:
+    tf.config.experimental.set_memory_growth(physical_devices[0], True)
 
 
 """
