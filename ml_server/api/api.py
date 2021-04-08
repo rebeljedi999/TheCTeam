@@ -26,6 +26,10 @@ from tf_agents.networks import network
 from tf_agents.specs import array_spec
 from tf_agents.specs import tensor_spec
 from tf_agents.policies import actor_policy
+import pandas as pd
+import os
+import pathlib
+from datetime import datetime
 
 tf.compat.v1.enable_v2_behavior()
 
@@ -144,5 +148,16 @@ def yes():
     local_data["buffer"].clear()
     return jsonify({"Result": "Success"})
 
+@app.route('/analyze', methods=['POST'])
+def analyze():
+    # get data and save to csv
+    data = request.get_json(force=True)
+    df = pd.DataFrame(dict(data))
+    now = datetime.now()
+    file_name = str(pathlib.Path(__file__).parent.absolute()) + "/data_readout/data-" +\
+                now.strftime("%m-%d-%Y_%H-%M-%S") + ".csv"
+    df.to_csv(file_name, index=False)
+    print("data saved")
+    return jsonify({"Result": "Success"})
 
 app.run()
