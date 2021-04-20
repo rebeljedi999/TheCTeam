@@ -77,3 +77,6 @@ Plugins/*/Intermediate/*
 DerivedDataCache/*
 ml_server/api/__pycache__/api.cpython-38.pyc
 .vscode/settings.json
+
+# Data files
+ml_server/api/data_readout/*

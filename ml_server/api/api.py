@@ -6,6 +6,7 @@ import flask
 from flask import request, jsonify
 import numpy as np
 import tensorflow as tf
+
 from tf_agents.agents import tf_agent
 from tf_agents.networks import actor_distribution_network
 from tf_agents.agents.reinforce import reinforce_agent
@@ -110,7 +111,7 @@ def observe():
 
 
 @app.route('/step', methods=['POST'])
-def train():
+def step():
     training = request.get_json(force=True)
     reward = training["reward"]
     obs = tf.constant(training["visualSensor"],
@@ -133,7 +134,7 @@ def train():
 
 
 @app.route('/train', methods=['POST'])
-def yes():
+def train():
     training = request.get_json(force=True)
     reward = training["reward"]
     obs = tf.constant(training["visualSensor"],
