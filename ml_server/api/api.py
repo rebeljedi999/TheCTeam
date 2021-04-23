@@ -36,9 +36,6 @@ log = logging.getLogger('werkzeug')
 log.setLevel(logging.ERROR)
 
 tf.compat.v1.enable_v2_behavior()
-#physical_devices = tf.config.list_physical_devices('GPU')
-#tf.config.experimental.set_memory_growth(physical_devices[0], True)
-
 
 """
 Shape specifications
@@ -117,7 +114,7 @@ def observe():
 
 
 @app.route('/step', methods=['POST'])
-def train():
+def step():
     training = request.get_json(force=True)
     reward = training["reward"]
     obs = tf.constant(training["visualSensor"] + [training["time"]] + [
@@ -136,7 +133,7 @@ def train():
 
 
 @app.route('/train', methods=['POST'])
-def yes():
+def train():
     # print('Train')
     training = request.get_json(force=True)
     reward = training["reward"]
@@ -172,6 +169,7 @@ def analyze():
 def save():
     data = request.get_json(force=True)
     saver.save('policies/' + data["name"])
+    print("model saved")
     return jsonify({"Result": "Success"})
 
 
@@ -179,10 +177,11 @@ def save():
 def load():
     data = request.get_json(force=True)
     saved = tf.compat.v2.saved_model.load('policies/' + data["name"])
+    print("model loaded")
     return jsonify({"Result": "Success"})
 
 @app.route('/list', methods=['GET'])
-def lis():
+def list():
     return jsonify({"Result": os.listdir('policies/')})
 
 app.run()
