@@ -2894,3 +2894,15 @@ JSON(
 [2021.04.23-16.39.29:955][210]OBJ SavePackage: Finished generating thumbnails for package [/Game/FirstPersonBP/Blueprints/Widget_Training_Menu]
 [2021.04.23-16.39.30:007][210]LogSavePackage: Moving '../../../../../Documents/GitHub/TheCTeam/TeamC/Saved/Widget_Training_Menu_Auto3892014CA49CB6104FFBE8C9315EF3047.tmp' to '../../../../../Documents/GitHub/TheCTeam/TeamC/Saved/Autosaves/Game/FirstPersonBP/Blueprints/Widget_Training_Menu_Auto3.uasset'
 [2021.04.23-16.39.30:010][210]LogFileHelpers: Auto-saving content packages took 0.233
+[2021.04.23-16.39.51:388][321]LogUObjectHash: Compacting FUObjectHashTables data took   0.92ms
+[2021.04.23-16.39.52:189][321]LogSlate: Window 'Save Content' being destroyed
+[2021.04.23-16.39.52:273][321]LogUObjectHash: Compacting FUObjectHashTables data took   1.33ms
+[2021.04.23-16.39.52:315][321]LogSavePackage: Moving '../../../../../Documents/GitHub/TheCTeam/TeamC/Saved/FirstPersonExampleMap366B288B48F022106CCB679555AA6624.tmp' to '../../../../../Documents/GitHub/TheCTeam/TeamC/Content/FirstPersonBP/Maps/FirstPersonExampleMap.umap'
+[2021.04.23-16.39.52:338][321]LogFileHelpers: Saving map 'FirstPersonExampleMap' took 0.108
+[2021.04.23-16.39.52:339][321]Cmd: OBJ SAVEPACKAGE PACKAGE="/Game/MachineLearning/ML_Controller" FILE="../../../../../Documents/GitHub/TheCTeam/TeamC/Content/MachineLearning/ML_Controller.uasset" SILENT=true
+[2021.04.23-16.39.52:545][321]LogSavePackage: Moving '../../../../../Documents/GitHub/TheCTeam/TeamC/Saved/ML_Controller1CD2FD6A4FD93A6FD19E9588DE60D2F0.tmp' to '../../../../../Documents/GitHub/TheCTeam/TeamC/Content/MachineLearning/ML_Controller.uasset'
+[2021.04.23-16.39.52:599][321]LogSavePackage: Moving '../../../../../Documents/GitHub/TheCTeam/TeamC/Saved/Widget_Training_MenuA750B13245DD9403DE48BC93734721B0.tmp' to '../../../../../Documents/GitHub/TheCTeam/TeamC/Content/FirstPersonBP/Blueprints/Widget_Training_Menu.uasset'
+[2021.04.23-16.39.52:632][321]AssetCheck: New page: Asset Save: multiple assets
+[2021.04.23-16.39.52:632][321]LogContentValidation: Display: Validating Blueprint /Game/MachineLearning/ML_Controller.ML_Controller
+[2021.04.23-16.39.52:633][321]LogContentValidation: Display: Validating WidgetBlueprint /Game/FirstPersonBP/Blueprints/Widget_Training_Menu.Widget_Training_Menu
+[2021.04.23-16.39.52:635][321]LogContentValidation: Display: Validating World /Game/FirstPersonBP/Maps/FirstPersonExampleMap.FirstPersonExampleMap
