@@ -25,7 +25,19 @@ from tf_agents.trajectories import time_step as ts
 from tf_agents.networks import network
 from tf_agents.specs import array_spec
 from tf_agents.specs import tensor_spec
+<<<<<<< Updated upstream
 from tf_agents.policies import actor_policy
+=======
+from tf_agents.policies import actor_policy, policy_saver
+import pandas as pd
+import os
+import pathlib
+from datetime import datetime
+import logging
+
+log = logging.getLogger('werkzeug')
+log.setLevel(logging.ERROR)
+>>>>>>> Stashed changes
 
 tf.compat.v1.enable_v2_behavior()
 #physical_devices = tf.config.list_physical_devices('GPU')
@@ -35,7 +47,7 @@ tf.compat.v1.enable_v2_behavior()
 """
 Shape specifications
 """
-input_tensor_spec = tensor_spec.TensorSpec((91), tf.float32)
+input_tensor_spec = tensor_spec.TensorSpec((94), tf.float32)
 time_step_spec = ts.time_step_spec(input_tensor_spec)
 action_spec = tensor_spec.BoundedTensorSpec((), tf.int64, minimum=0, maximum=8)
 
@@ -46,9 +58,9 @@ Agent
 actor_net = actor_distribution_network.ActorDistributionNetwork(
     input_tensor_spec,
     action_spec,
-    fc_layer_params=(100,))
+    fc_layer_params=(200, 100, 50, 20))
 
-optimizer = tf.compat.v1.train.AdamOptimizer(learning_rate=0.001, epsilon=1e-8)
+optimizer = tf.compat.v1.train.AdamOptimizer(learning_rate=1e-3, epsilon=1)
 
 train_step_counter = tf.compat.v2.Variable(0)
 
@@ -62,38 +74,44 @@ agent = reinforce_agent.ReinforceAgent(
 
 agent.initialize()
 
-"""
-Turns an initial observation, the resulting action, and the observation after that action
-into a trajectory, which can be used to train the model.
-"""
-
 replay_buffer = tf_uniform_replay_buffer.TFUniformReplayBuffer(
     data_spec=agent.collect_data_spec,
     batch_size=1,
     max_length=120)
 
+saver = policy_saver.PolicySaver(agent.collect_policy, batch_size=None)
 
+
+"""
+Turns an initial observation, the resulting action, and the observation after that action
+into a trajectory, which can be used to train the model.
+"""
 def trajectory_creator(initial_step, action_step, final_step):
-  return trajectory.Trajectory(observation=tf.expand_dims(initial_step.observation, 0),
-                               action=tf.expand_dims(action_step.action, 0),
-                               policy_info=action_step.info,
-                               reward=tf.expand_dims(final_step.reward, 0),
-                               discount=tf.expand_dims(final_step.discount, 0),
-                               step_type=tf.expand_dims(initial_step.step_type, 0),
-                               next_step_type=tf.expand_dims(final_step.step_type, 0))
+    return trajectory.Trajectory(observation=tf.expand_dims(initial_step.observation, 0),
+                                 action=tf.expand_dims(action_step.action, 0),
+                                 policy_info=action_step.info,
+                                 reward=tf.expand_dims(final_step.reward, 0),
+                                 discount=tf.expand_dims(
+                                     final_step.discount, 0),
+                                 step_type=tf.expand_dims(
+                                     initial_step.step_type, 0),
+                                 next_step_type=tf.expand_dims(final_step.step_type, 0))
 
 
 local_data = {}
 local_data["buffer"] = replay_buffer
-###############################################################
+"""
+Flask API 
+"""
 app = flask.Flask(__name__)
 app.config["DEBUG"] = True
+
 
 @app.route('/start', methods=['POST'])
 def observe():
     observation = request.get_json(force=True)
-    print(observation)
-    obs = tf.constant(observation["visualSensor"], shape=(91), dtype=tf.float32)
+    obs = tf.constant(observation["visualSensor"] + [observation["time"]] + [
+                      observation["canSee"]] + [observation["health"]], shape=(94), dtype=tf.float32)
     time_step = ts.restart(obs)
     action_step = agent.collect_policy.action(time_step)
     local_data["action"] = action_step
@@ -106,16 +124,12 @@ def observe():
 def train():
     training = request.get_json(force=True)
     reward = training["reward"]
-    obs = tf.constant(training["visualSensor"],
-                      shape=(91), dtype=tf.float32)
+    obs = tf.constant(training["visualSensor"] + [training["time"]] + [
+                      training["canSee"]] + [training["health"]], shape=(94), dtype=tf.float32)
     time_step = ts.transition(obs, reward)
     last_step = local_data["step"]
     action = local_data["action"]
     experience = trajectory_creator(last_step, action, time_step)
-    print("Buffer:" )
-    print(local_data["buffer"])
-    print("Experience:" )
-    print(experience)
     local_data["buffer"].add_batch(experience)
     local_data["step"] = time_step
     time_step = ts.transition(obs, reward)
@@ -127,19 +141,55 @@ def train():
 
 @app.route('/train', methods=['POST'])
 def yes():
+    # print('Train')
     training = request.get_json(force=True)
     reward = training["reward"]
-    obs = tf.constant(training["visualSensor"],
-                      shape=(1, 91), dtype=tf.float32)
+    obs = tf.constant(training["visualSensor"] + [training["time"]] + [
+                      training["canSee"]] + [training["health"]], shape=(94), dtype=tf.float32)
     time_step = ts.termination(obs, reward)
     last_step = local_data["step"]
     action = local_data["action"]
     experience = trajectory_creator(last_step, action, time_step)
     local_data["buffer"].add_batch(experience)
     data = local_data["buffer"].gather_all()
-    tl = agent._train(data)
+    tl = agent.train(data)
+    print('Loss = {0}'.format(tl.loss))
     local_data["buffer"].clear()
+
     return jsonify({"Result": "Success"})
 
+<<<<<<< Updated upstream
+=======
+
+@app.route('/analyze', methods=['POST'])
+def analyze():
+    # get data and save to csv
+    data = request.get_json(force=True)
+    df = pd.DataFrame(dict(data))
+    now = datetime.now()
+    file_name = str(pathlib.Path(__file__).parent.absolute()) + "/data_readout/data-" +\
+        now.strftime("%m-%d-%Y_%H-%M-%S") + ".csv"
+    df.to_csv(file_name, index=False)
+    print("data saved")
+    return jsonify({"Result": "Success"})
+>>>>>>> Stashed changes
+
+
+@app.route('/save', methods=['POST'])
+def save():
+    data = request.get_json(force=True)
+    saver.save('policies/' + data["name"])
+    return jsonify({"Result": "Success"})
+
+
+@app.route('/load', methods=['POST'])
+def load():
+    data = request.get_json(force=True)
+    saved = tf.compat.v2.saved_model.load('policies/' + data["name"])
+    return jsonify({"Result": "Success"})
+
+@app.route('/list', methods=['GET'])
+def lis():
+    return jsonify({"Result": os.listdir('policies/')})
 
 app.run()

@@ -1,6 +1,9 @@
 # Visual Studio 2015 user specific files
 .vs/
 
+# User models
+ml_server/api/policies/*
+
 # Compiled Object files
 *.slo
 *.lo
@@ -74,3 +77,4 @@ Plugins/*/Intermediate/*
 DerivedDataCache/*
 ml_server/api/__pycache__/api.cpython-38.pyc
 .vscode/settings.json
+*.log
