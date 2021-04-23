@@ -25,9 +25,6 @@ from tf_agents.trajectories import time_step as ts
 from tf_agents.networks import network
 from tf_agents.specs import array_spec
 from tf_agents.specs import tensor_spec
-<<<<<<< Updated upstream
-from tf_agents.policies import actor_policy
-=======
 from tf_agents.policies import actor_policy, policy_saver
 import pandas as pd
 import os
@@ -37,7 +34,6 @@ import logging
 
 log = logging.getLogger('werkzeug')
 log.setLevel(logging.ERROR)
->>>>>>> Stashed changes
 
 tf.compat.v1.enable_v2_behavior()
 #physical_devices = tf.config.list_physical_devices('GPU')
@@ -158,8 +154,6 @@ def yes():
 
     return jsonify({"Result": "Success"})
 
-<<<<<<< Updated upstream
-=======
 
 @app.route('/analyze', methods=['POST'])
 def analyze():
@@ -172,7 +166,6 @@ def analyze():
     df.to_csv(file_name, index=False)
     print("data saved")
     return jsonify({"Result": "Success"})
->>>>>>> Stashed changes
 
 
 @app.route('/save', methods=['POST'])
