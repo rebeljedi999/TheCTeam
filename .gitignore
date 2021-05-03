@@ -86,3 +86,5 @@ ml_server/api/data_readout/*
 
 *.log
 
+# Auto save files and logs
+TeamC/Saved/*
