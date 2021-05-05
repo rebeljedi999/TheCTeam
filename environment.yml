@@ -162,15 +162,15 @@ dependencies:
     - pyglet==1.5.0
     - pytz==2021.1
     - scipy==1.4.1
-    - tensorboard==2.4.1
-    - tensorboard-data-server==0.6.0
-    - tensorboard-plugin-wit==1.8.0
-    - tensorflow==2.4.1
-    - tensorflow-estimator==2.4.0
-    - tensorflow-gpu==2.2.0
-    - tensorflow-gpu-estimator==2.2.0
-    - tensorflow-probability==0.12.1
-    - tf-agents==0.7.1
+    - tensorboard
+    - tensorboard-data-server
+    - tensorboard-plugin-wit
+    - tensorflow
+    - tensorflow-estimator
+    - tensorflow-gpu
+    - tensorflow-gpu-estimator
+    - tensorflow-probability
+    - tf-agents
     - toml==0.10.2
     - werkzeug==1.0.1
 prefix: C:\Users\rebel\AppData\Local\Continuum\anaconda3\envs\ue4-server
