@@ -32,15 +32,17 @@ import pathlib
 from datetime import datetime
 import logging
 
+
 log = logging.getLogger('werkzeug')
 log.setLevel(logging.ERROR)
-
+tf.compat.v1.logging.set_verbosity(tf.compat.v1.logging.ERROR)
 tf.compat.v1.enable_v2_behavior()
 
 """
 Shape specifications
 """
-input_tensor_spec = tensor_spec.TensorSpec((8375), tf.float32)
+INPUT_SHAPE = 8556
+input_tensor_spec = tensor_spec.TensorSpec((INPUT_SHAPE), tf.float32)
 time_step_spec = ts.time_step_spec(input_tensor_spec)
 action_spec = tensor_spec.BoundedTensorSpec((), tf.int64, minimum=0, maximum=8)
 
@@ -110,7 +112,7 @@ def observe():
     [training["canSee"]], 
     tf.keras.utils.normalize([training["health"]])])
     data = np.append(data, tf.keras.utils.normalize(training["SASensor"]))
-    obs = tf.constant(data, shape=(8375), dtype=tf.float32)
+    obs = tf.constant(data, shape=(INPUT_SHAPE), dtype=tf.float32)
     time_step = ts.restart(obs)
     action_step = agent.collect_policy.action(time_step)
     local_data["action"] = action_step
@@ -128,7 +130,7 @@ def step():
     [training["canSee"]], 
     tf.keras.utils.normalize([training["health"]])])
     data = np.append(data, tf.keras.utils.normalize(training["SASensor"]))
-    obs = tf.constant(data, shape=(8375), dtype=tf.float32)
+    obs = tf.constant(data, shape=(INPUT_SHAPE), dtype=tf.float32)
     time_step = ts.transition(obs, reward)
     last_step = local_data["step"]
     action = local_data["action"]
@@ -151,7 +153,7 @@ def train():
     [training["canSee"]], 
     tf.keras.utils.normalize([training["health"]])])
     data = np.append(data, tf.keras.utils.normalize(training["SASensor"]))
-    obs = tf.constant(data, shape=(8375), dtype=tf.float32)
+    obs = tf.constant(data, shape=(INPUT_SHAPE), dtype=tf.float32)
     time_step = ts.termination(obs, reward)
     last_step = local_data["step"]
     action = local_data["action"]
