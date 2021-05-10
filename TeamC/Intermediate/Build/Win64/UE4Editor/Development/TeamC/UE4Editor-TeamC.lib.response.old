@@ -1,0 +1,14 @@
+/NOLOGO
+/errorReport:prompt
+/MACHINE:x64
+/SUBSYSTEM:WINDOWS
+/DEF
+/NAME:"UE4Editor-TeamC.dll"
+/IGNORE:4221
+/NODEFAULTLIB
+"C:\Users\rebel\Documents\GitHub\TheCTeam\TeamC\Intermediate\Build\Win64\TeamCEditor\Development\Engine\SharedPCH.Engine.ShadowErrors.h.obj"
+"C:\Users\rebel\Documents\GitHub\TheCTeam\TeamC\Intermediate\Build\Win64\UE4Editor\Development\TeamC\Blank.cpp.obj"
+"C:\Users\rebel\Documents\GitHub\TheCTeam\TeamC\Intermediate\Build\Win64\UE4Editor\Development\TeamC\TeamC.cpp.obj"
+"C:\Users\rebel\Documents\GitHub\TheCTeam\TeamC\Intermediate\Build\Win64\UE4Editor\Development\TeamC\Default.rc2.res"
+/OUT:"C:\Users\rebel\Documents\GitHub\TheCTeam\TeamC\Intermediate\Build\Win64\UE4Editor\Development\TeamC\UE4Editor-TeamC.lib"
+/INCLUDE:IMPLEMENT_MODULE_TeamC

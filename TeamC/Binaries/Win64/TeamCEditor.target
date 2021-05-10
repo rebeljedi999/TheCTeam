@@ -28,19 +28,19 @@
 			"Type": "Executable"
 		},
 		{
-			"Path": "$(ProjectDir)/Plugins/VaRest/Binaries/Win64/UE4Editor-VaRest.dll",
+			"Path": "$(EngineDir)/Plugins/Marketplace/VaRestPlugin/Binaries/Win64/UE4Editor-VaRest.dll",
 			"Type": "DynamicLibrary"
 		},
 		{
-			"Path": "$(ProjectDir)/Plugins/VaRest/Binaries/Win64/UE4Editor-VaRest.pdb",
+			"Path": "$(EngineDir)/Plugins/Marketplace/VaRestPlugin/Binaries/Win64/UE4Editor-VaRest.pdb",
 			"Type": "SymbolFile"
 		},
 		{
-			"Path": "$(ProjectDir)/Plugins/VaRest/Binaries/Win64/UE4Editor-VaRestEditor.dll",
+			"Path": "$(EngineDir)/Plugins/Marketplace/VaRestPlugin/Binaries/Win64/UE4Editor-VaRestEditor.dll",
 			"Type": "DynamicLibrary"
 		},
 		{
-			"Path": "$(ProjectDir)/Plugins/VaRest/Binaries/Win64/UE4Editor-VaRestEditor.pdb",
+			"Path": "$(EngineDir)/Plugins/Marketplace/VaRestPlugin/Binaries/Win64/UE4Editor-VaRestEditor.pdb",
 			"Type": "SymbolFile"
 		},
 		{
@@ -2256,7 +2256,7 @@
 			"Type": "RequiredResource"
 		},
 		{
-			"Path": "$(ProjectDir)/Plugins/VaRest/Binaries/Win64/UE4Editor.modules",
+			"Path": "$(EngineDir)/Plugins/Marketplace/VaRestPlugin/Binaries/Win64/UE4Editor.modules",
 			"Type": "RequiredResource"
 		},
 		{
@@ -2694,7 +2694,7 @@
 			"Type": "UFS"
 		},
 		{
-			"Path": "$(ProjectDir)/Plugins/VaRest/VaRest.uplugin",
+			"Path": "$(EngineDir)/Plugins/Marketplace/VaRestPlugin/VaRest.uplugin",
 			"Type": "UFS"
 		},
 		{

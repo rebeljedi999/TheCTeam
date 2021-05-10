@@ -32,15 +32,17 @@ import pathlib
 from datetime import datetime
 import logging
 
+
 log = logging.getLogger('werkzeug')
 log.setLevel(logging.ERROR)
-
+tf.compat.v1.logging.set_verbosity(tf.compat.v1.logging.ERROR)
 tf.compat.v1.enable_v2_behavior()
 
 """
 Shape specifications
 """
-input_tensor_spec = tensor_spec.TensorSpec((94), tf.float32)
+INPUT_SHAPE = 8556
+input_tensor_spec = tensor_spec.TensorSpec((INPUT_SHAPE), tf.float32)
 time_step_spec = ts.time_step_spec(input_tensor_spec)
 action_spec = tensor_spec.BoundedTensorSpec((), tf.int64, minimum=0, maximum=8)
 
@@ -51,7 +53,9 @@ Agent
 actor_net = actor_distribution_network.ActorDistributionNetwork(
     input_tensor_spec,
     action_spec,
-    fc_layer_params=(200, 100, 50, 20))
+    fc_layer_params=[200, 100, 50, 20],
+    dropout_layer_params=[0.0, 0.4, 0.4, 0],
+    activation_fn=tf.nn.relu)
 
 optimizer = tf.compat.v1.train.AdamOptimizer(learning_rate=1e-3, epsilon=1)
 
@@ -79,6 +83,8 @@ saver = policy_saver.PolicySaver(agent.collect_policy, batch_size=None)
 Turns an initial observation, the resulting action, and the observation after that action
 into a trajectory, which can be used to train the model.
 """
+
+
 def trajectory_creator(initial_step, action_step, final_step):
     return trajectory.Trajectory(observation=tf.expand_dims(initial_step.observation, 0),
                                  action=tf.expand_dims(action_step.action, 0),
@@ -102,9 +108,13 @@ app.config["DEBUG"] = True
 
 @app.route('/start', methods=['POST'])
 def observe():
-    observation = request.get_json(force=True)
-    obs = tf.constant(observation["visualSensor"] + [observation["time"]] + [
-                      observation["canSee"]] + [observation["health"]], shape=(94), dtype=tf.float32)
+    training = request.get_json(force=True)
+    data = np.append(tf.keras.utils.normalize(training["visualSensor"]), 
+    [tf.keras.utils.normalize([training["time"]]), 
+    [training["canSee"]], 
+    tf.keras.utils.normalize([training["health"]])])
+    data = np.append(data, tf.keras.utils.normalize(training["SASensor"]))
+    obs = tf.constant(data, shape=(INPUT_SHAPE), dtype=tf.float32)
     time_step = ts.restart(obs)
     action_step = agent.collect_policy.action(time_step)
     local_data["action"] = action_step
@@ -117,15 +127,18 @@ def observe():
 def step():
     training = request.get_json(force=True)
     reward = training["reward"]
-    obs = tf.constant(training["visualSensor"] + [training["time"]] + [
-                      training["canSee"]] + [training["health"]], shape=(94), dtype=tf.float32)
+    data = np.append(tf.keras.utils.normalize(training["visualSensor"]), 
+    [tf.keras.utils.normalize([training["time"]]), 
+    [training["canSee"]], 
+    tf.keras.utils.normalize([training["health"]])])
+    data = np.append(data, tf.keras.utils.normalize(training["SASensor"]))
+    obs = tf.constant(data, shape=(INPUT_SHAPE), dtype=tf.float32)
     time_step = ts.transition(obs, reward)
     last_step = local_data["step"]
     action = local_data["action"]
     experience = trajectory_creator(last_step, action, time_step)
     local_data["buffer"].add_batch(experience)
     local_data["step"] = time_step
-    time_step = ts.transition(obs, reward)
     action_step = agent.collect_policy.action(time_step)
     action = action_step.action.numpy()
     local_data["action"] = action_step
@@ -137,8 +150,12 @@ def train():
     # print('Train')
     training = request.get_json(force=True)
     reward = training["reward"]
-    obs = tf.constant(training["visualSensor"] + [training["time"]] + [
-                      training["canSee"]] + [training["health"]], shape=(94), dtype=tf.float32)
+    data = np.append(tf.keras.utils.normalize(training["visualSensor"]), 
+    [tf.keras.utils.normalize([training["time"]]), 
+    [training["canSee"]], 
+    tf.keras.utils.normalize([training["health"]])])
+    data = np.append(data, tf.keras.utils.normalize(training["SASensor"]))
+    obs = tf.constant(data, shape=(INPUT_SHAPE), dtype=tf.float32)
     time_step = ts.termination(obs, reward)
     last_step = local_data["step"]
     action = local_data["action"]
@@ -180,8 +197,10 @@ def load():
     print("model loaded")
     return jsonify({"Result": "Success"})
 
+
 @app.route('/list', methods=['GET'])
 def list():
     return jsonify({"Result": os.listdir('policies/')})
+
 
 app.run()

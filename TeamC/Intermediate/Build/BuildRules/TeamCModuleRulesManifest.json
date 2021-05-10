@@ -1,10 +1,8 @@
 {
 	"SourceFiles": [
-		"C:\\Users\\rebel\\Documents\\GitHub\\TheCTeam\\TeamC\\Source\\TeamC\\TeamC.Build.cs",
-		"C:\\Users\\rebel\\Documents\\GitHub\\TheCTeam\\TeamC\\Plugins\\VaRest\\Source\\VaRest\\VaRest.Build.cs",
-		"C:\\Users\\rebel\\Documents\\GitHub\\TheCTeam\\TeamC\\Plugins\\VaRest\\Source\\VaRestEditor\\VaRestEditor.Build.cs",
-		"C:\\Users\\rebel\\Documents\\GitHub\\TheCTeam\\TeamC\\Source\\TeamC.Target.cs",
-		"C:\\Users\\rebel\\Documents\\GitHub\\TheCTeam\\TeamC\\Source\\TeamCEditor.Target.cs"
+		"C:\\Users\\johna\\Documents\\GitHub\\TheCTeam\\TeamC\\Source\\TeamC\\TeamC.Build.cs",
+		"C:\\Users\\johna\\Documents\\GitHub\\TheCTeam\\TeamC\\Source\\TeamC.Target.cs",
+		"C:\\Users\\johna\\Documents\\GitHub\\TheCTeam\\TeamC\\Source\\TeamCEditor.Target.cs"
 	],
 	"EngineVersion": "4.26.1"
 }
