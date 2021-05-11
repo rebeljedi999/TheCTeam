@@ -1,0 +1,2 @@
+C:\Users\johna\Documents\GitHub\TheCTeam\TeamC\Intermediate\Build\Win64\UE4Editor\Development\TeamC\Definitions.TeamC.h
+C:\Users\johna\Documents\GitHub\TheCTeam\TeamC\Source\TeamC\Blank.h

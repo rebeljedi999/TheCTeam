@@ -1,0 +1,14 @@
+{
+	"Targets": [
+		{
+			"Name": "TeamC",
+			"Path": "C:\\Users\\rebel\\Documents\\GitHub\\TheCTeam\\TeamC\\Source\\TeamC.Target.cs",
+			"Type": "Game"
+		},
+		{
+			"Name": "TeamCEditor",
+			"Path": "C:\\Users\\rebel\\Documents\\GitHub\\TheCTeam\\TeamC\\Source\\TeamCEditor.Target.cs",
+			"Type": "Editor"
+		}
+	]
+}
