@@ -54,10 +54,10 @@ actor_net = actor_distribution_network.ActorDistributionNetwork(
     input_tensor_spec,
     action_spec,
     fc_layer_params=[4000, 2000, 1000, 500, 250, 125, 50, 20],
-    dropout_layer_params=[0, 0, 0, 0, 0, 0, 0, 0],
+    dropout_layer_params=[0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2],
     activation_fn=tf.nn.relu)
 
-optimizer = tf.compat.v1.train.AdamOptimizer(learning_rate=1e-3, epsilon=1)
+optimizer = tf.compat.v1.train.AdamOptimizer(learning_rate=1e-4)
 
 train_step_counter = tf.compat.v2.Variable(0)
 
