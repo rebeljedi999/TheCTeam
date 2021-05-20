@@ -3,6 +3,8 @@ This project contains everything needed to train an AI to shoot targets in the u
 an unreal engine project that provides a level and an interface to train the agent. The unreal engine will
 communicate with a flask server that hosts the agent.
 
+Presentation: https://youtu.be/YDUHjrXInr0
+
 ## The Team
 Kyle Hinton (kah31@hood.edu)
 Somayyeh Kamyab (sk43@hood.edu)
